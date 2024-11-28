@@ -28,12 +28,14 @@ jobs:
       - name: Run conversion script
         run: python convert_bmpn.py
 
-      - name: Commit and push generated images
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull remote changes (to prevent conflicts)
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
+          git pull origin main --rebase || true
+
+      - name: Commit and push generated images
+        run: |
           git add generated_images/
           git commit -m "Generated images for updated BMPN files" || echo "No changes to commit"
-          git push
+          git push origin main
