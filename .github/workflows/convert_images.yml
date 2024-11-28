@@ -1,0 +1,35 @@
+name: Convert BMPN to Images
+
+on:
+  push:
+    paths:
+      - "bmpn_files/**"
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow
+
+      - name: Run conversion script
+        run: python convert_bmpn.py
+
+      - name: Commit and push generated images
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git add generated_images/
+          git commit -m "Generated images for updated BMPN files" || echo "No changes to commit"
+          git push
